@@ -18,6 +18,11 @@
     "react": "^16.2.0",
     "react-dom": "^16.2.0"
   },
+  "prettier": {
+    "trailingComma": "es5",
+    "singleQuote": true,
+    "printWidth": 120
+  },
   "devDependencies": {
     "@types/grafana": "github:CorpGlory/types-grafana.git",
     "@types/jest": "^23.3.1",
