@@ -1,48 +1,42 @@
 import moment from 'moment';
 
 import { Subject } from 'rxjs';
+import _ from 'lodash';
 
-// See:
-// https://github.com/seanlaff/simple-streaming-datasource/blob/master/src/stream_handler.js
+export interface StreamHandlerOptions {
+  delay:number,
+  maxPoints:number;
+}
 
-// We return a StreamHandler wrapped in a promise from the datasource's
-// Query method. Grafana expects this object to have a `subscribe` method,
-// which it reads live data from.
-export class StreamHandler {
+const defaultOptions:StreamHandlerOptions = {
+  delay: 100, // 10hz
+  maxPoints: 50, // 
+}
 
-  subject = new Subject();
+export class StreamHandler extends Subject<any> {
+
   data:any = {
     columns: [{text:'Value'},{text:'Time'}],
     rows: [],
   };
 
-  value :number;
+  options: StreamHandlerOptions;
 
   constructor(options:any, datasource:any) {
+    super();
 
-    this.value = Math.random();
-    this.looper();
-
-    console.log( 'StreamHandler', options, datasource );
+    this.options = _.defaults(options, defaultOptions);
   }
 
-  subscribe = options => {
-    // To avoid destroying the browser with repaints, add a throttle (You may want to tweak this)
-    var throttledSubject = this.subject.pipe(); //rxjs.operators.throttleTime(100));
-    return throttledSubject.subscribe(options);
-  };
-
-  looper = () => {
-    this.value += (Math.random()-0.5)*.2;
-    this.handleMessage( [this.value, Date.now()] );
-    setTimeout(this.looper, 100);
-  }
-
-  handleMessage(row:any[]) {
+  addRows(add:any[][]) {
     let rows = this.data.rows;
 
-    rows.push(row);
-    if(rows.length > 50) {
+    // Add each row
+    add.forEach( row => {
+      rows.push(row);
+    });
+
+    if(rows.length > this.options.maxPoints) {
       rows = rows.slice(1);
       this.data.rows = rows;
     }
@@ -50,7 +44,7 @@ export class StreamHandler {
     const oldestTimestamp = rows[0][1];
     const mostRecentTimestamp = rows[rows.length-1][1];
 
-    this.subject.next({
+    this.next({
       data: [{
         datapoints: rows,
       }],
@@ -58,9 +52,13 @@ export class StreamHandler {
     });
   }
 
-  // close() {
-  //   if (this.reader) {
-  //     this.reader.cancel('Close was called on streamHandler');
-  //   }
-  // }
+  error(err: any): void {
+    super.error(err);
+    console.log( 'GOT AN ERROR!', err, this );
+  }
+
+  complete(): void {
+    super.complete();
+    console.log( 'COMPLETE', this );
+  }
 }
