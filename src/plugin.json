@@ -1,0 +1,27 @@
+{
+  "type": "datasource",
+  "name": "Streaming",
+  "id": "ryantxu-streaming-datasource",
+  "metrics": true,
+  "explote": true,
+  "alerting": true,
+  "info": {
+    "description": "Streaming Datasource",
+    "author": {
+      "name": "Ryan McKinley",
+      "url": "https://github.com/ryantxu"
+    },
+    "links": [
+      {
+        "name": "Project site",
+        "url": "https://github.com/ryantxu/streaming-datasource"
+      }
+    ],
+    "logos": {
+      "small": "img/stream.svg",
+      "large": "img/stream.svg"
+    },
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  }
+}
