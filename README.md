@@ -11,6 +11,20 @@ https://github.com/seanlaff/simple-streaming-datasource/
 This currently does a javascript only random walk
 
 
+### Example Server
+
+To run the sample server run:
+```
+go run server.go
+```
+
+
+To see the output it produces, run:
+```
+curl --no-buffer http://localhost:7777
+```
+
+
 ### Building
 
 To complie, run:
