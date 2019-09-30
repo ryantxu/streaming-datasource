@@ -1,17 +1,20 @@
 import { DataQuery, DataSourceJsonData } from '@grafana/ui';
+import { FieldConfig } from '@grafana/data';
 
-export interface MyQuery extends DataQuery {
-  queryText?: string;
-  constant: number;
+export interface StreamingQuery extends DataQuery {
+  name?: string;
 }
-
-export const defaultQuery: Partial<MyQuery> = {
-  constant: 6.5,
-};
 
 /**
  * These are options configured for each DataSource instance
  */
 export interface MyDataSourceOptions extends DataSourceJsonData {
   apiKey?: string;
+}
+
+export interface TimeSeriesMessage {
+  name: string; // Name of the field
+  config?: FieldConfig; // optionally include field config
+  time?: number;
+  value?: any;
 }

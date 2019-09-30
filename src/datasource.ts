@@ -1,38 +1,48 @@
-import defaults from 'lodash/defaults';
-
 import { DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings } from '@grafana/ui';
 
-import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
-import { MutableDataFrame, FieldType } from '@grafana/data';
+import { StreamingQuery, MyDataSourceOptions } from './types';
+import { Observable, of, merge } from 'rxjs';
+import { StreamListener } from 'StreamingListener';
 
-export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
+export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOptions> {
+  listener?: StreamListener;
+
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
+    if (instanceSettings.url) {
+      this.listener = new StreamListener(1000, instanceSettings.url);
+    }
   }
 
-  query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
-    const { range } = options;
-    const from = range.from.valueOf();
-    const to = range.to.valueOf();
+  query(options: DataQueryRequest<StreamingQuery>): Observable<DataQueryResponse> {
+    if (!this.listener) {
+      throw new Error('missing listener');
+    }
 
-    // Return a constant for each query
-    const data = options.targets.map(target => {
-      const query = defaults(target, defaultQuery);
-      return new MutableDataFrame({
-        refId: query.refId,
-        fields: [
-          { name: 'Time', values: [from, to], type: FieldType.time },
-          { name: 'Value', values: [query.constant, query.constant], type: FieldType.number },
-        ],
-      });
+    let hasStar = false;
+    let subs: Array<Observable<DataQueryResponse>> = [];
+    options.targets.forEach(t => {
+      if (!t.name || t.name === '*') {
+        hasStar = true;
+      } else {
+        subs.push(this.listener!.listen(t.name));
+      }
     });
 
-    return Promise.resolve({ data });
+    if (hasStar) {
+      subs = this.listener.getAllObservers();
+    }
+    if (subs.length === 0) {
+      return of({ data: [] }); // nothing
+    }
+    if (subs.length === 1) {
+      return subs[0];
+    }
+    return merge(...subs);
   }
 
   testDatasource() {
     // Implement a health check for your data source.
-
     return new Promise((resolve, reject) => {
       resolve({
         status: 'success',

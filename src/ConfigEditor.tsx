@@ -11,13 +11,13 @@ interface State {}
 export class ConfigEditor extends PureComponent<Props, State> {
   componentDidMount() {}
 
-  onAPIKeyChange = (event: ChangeEvent<HTMLInputElement>) => {
+  onURLChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
-    const jsonData = {
-      ...options.jsonData,
-      apiKey: event.target.value,
-    };
-    onOptionsChange({ ...options, jsonData });
+    // const jsonData = {
+    //   ...options.jsonData,
+    //   apiKey: event.target.value,
+    // };
+    onOptionsChange({ ...options, url: event.target.value });
   };
 
   render() {
@@ -27,7 +27,7 @@ export class ConfigEditor extends PureComponent<Props, State> {
     return (
       <div className="gf-form-group">
         <div className="gf-form">
-          <FormField label="API Key" labelWidth={6} onChange={this.onAPIKeyChange} value={jsonData.apiKey || ''} placeholder="Your API key" />
+          <FormField label="Web Socket URL" labelWidth={10} onChange={this.onURLChange} value={jsonData.apiKey || ''} placeholder="Websocket URL" />
         </div>
       </div>
     );
