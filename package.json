@@ -1,53 +1,20 @@
 {
   "name": "ryantxu-streaming-datasource",
-  "version": "0.0.1-dev",
-  "description": "Streaming Datasource",
+  "version": "0.0.1",
+  "description": "Example of a Grafana Data Source",
   "scripts": {
-    "build": "webpack --config webpack.config.prod.js",
-    "dev": "webpack --mode development",
-    "watch": "webpack --mode development --watch",
-    "test": "jest --config jest.config.js",
-    "release": "node release.js",
-    "precommit": "pretty-quick --staged",
-    "pretty": "prettier --write src/**/*.ts"
+    "build": "grafana-toolkit plugin:build",
+    "test": "grafana-toolkit plugin:test",
+    "dev": "grafana-toolkit plugin:dev",
+    "watch": "grafana-toolkit plugin:dev --watch"
   },
   "author": "Ryan McKinley",
-  "license": "Apache",
-  "dependencies": {
-    "lodash": "^4.17.10",
-    "react": "^16.2.0",
-    "react-dom": "^16.2.0"
-  },
-  "prettier": {
-    "trailingComma": "es5",
-    "singleQuote": true,
-    "printWidth": 120
-  },
+  "license": "Apache-2.0",
   "devDependencies": {
-    "@types/grafana": "github:CorpGlory/types-grafana.git",
-    "@types/jest": "^23.3.1",
-    "@types/lodash": "^4.14.74",
-    "@types/react": "^16.2.0",
-    "babel-core": "^6.26.3",
-    "babel-jest": "^23.0.1",
-    "babel-loader": "^7.1.4",
-    "babel-preset-env": "^1.7.0",
-    "clean-webpack-plugin": "^0.1.19",
-    "copy-webpack-plugin": "^4.5.1",
-    "css-loader": "^1.0.0",
-    "grafana-sdk-mocks": "github:ryantxu/grafana-sdk-mocks",
-    "jest": "^23.0.1",
-    "ng-annotate-webpack-plugin": "^0.3.0",
-    "prettier": "^1.14",
-    "pretty-quick": "^1.4.1",
-    "replace-in-file-webpack-plugin": "^1.0.6",
-    "rxjs": "^6.3.3",
-    "style-loader": "^0.22",
-    "ts-jest": "^23",
-    "ts-loader": "^4.3.0",
-    "typescript": "^3",
-    "webpack": "^4.17",
-    "webpack-cli": "^3.1",
-    "uglifyjs-webpack-plugin": "^2.1.1"
+    "@grafana/data": "next",
+    "@grafana/toolkit": "next",
+    "@grafana/ui": "next",
+    "@types/lodash": "^4.14.134",
+    "lodash": "^4.17.15"
   }
 }

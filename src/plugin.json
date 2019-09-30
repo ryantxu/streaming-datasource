@@ -1,27 +1,30 @@
 {
   "type": "datasource",
-  "name": "Streaming",
+  "name": "Streaming Source",
   "id": "ryantxu-streaming-datasource",
   "metrics": true,
-  "explote": true,
-  "alerting": true,
+
   "info": {
-    "description": "Streaming Datasource",
+    "description": "Streaming Data Source",
     "author": {
-      "name": "Ryan McKinley",
-      "url": "https://github.com/ryantxu"
+      "name": "Ryan McKinley"
     },
-    "links": [
-      {
-        "name": "Project site",
-        "url": "https://github.com/ryantxu/streaming-datasource"
-      }
-    ],
+    "keywords": ["Streaming", "Websocket"],
     "logos": {
       "small": "img/stream.svg",
       "large": "img/stream.svg"
     },
+    "links": [
+      { "name": "Website", "url": "https://github.com/grafana/simple-datasource" },
+      { "name": "License", "url": "https://github.com/grafana/simple-datasource/blob/master/LICENSE" }
+    ],
+    "screenshots": [],
     "version": "%VERSION%",
     "updated": "%TODAY%"
+  },
+
+  "dependencies": {
+    "grafanaVersion": "6.4.x",
+    "plugins": []
   }
 }

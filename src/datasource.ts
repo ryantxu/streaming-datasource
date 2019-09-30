@@ -1,47 +1,42 @@
-import _ from 'lodash';
+import defaults from 'lodash/defaults';
 
-import { RandomWalkStream } from './RandomWalkStream';
-import { StreamHandler } from './StreamHandler';
+import { DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings } from '@grafana/ui';
 
-export default class StreamingDatasource {
-  interval: any;
+import { MyQuery, MyDataSourceOptions, defaultQuery } from './types';
+import { MutableDataFrame, FieldType } from '@grafana/data';
 
-  supportsExplore: boolean = true;
-  supportAnnotations: boolean = true;
-  supportMetrics: boolean = true;
-
-  openStreams: { [key: string]: StreamHandler } = {};
-
-  /** @ngInject */
-  constructor(instanceSettings, public backendSrv, public templateSrv) {
-    const safeJsonData = instanceSettings.jsonData || {};
-
-    this.interval = safeJsonData.timeInterval;
+export class DataSource extends DataSourceApi<MyQuery, MyDataSourceOptions> {
+  constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
+    super(instanceSettings);
   }
 
-  query(options: any) {
-    const { panelId } = options;
-    const { openStreams } = this;
+  query(options: DataQueryRequest<MyQuery>): Promise<DataQueryResponse> {
+    const { range } = options;
+    const from = range.from.valueOf();
+    const to = range.to.valueOf();
 
-    let stream = openStreams[panelId];
-    if (!stream) {
-      stream = new RandomWalkStream(options, this);
-      openStreams[panelId] = stream;
-      console.log('MAKE', openStreams);
-    }
-    return Promise.resolve(stream);
-  }
+    // Return a constant for each query
+    const data = options.targets.map(target => {
+      const query = defaults(target, defaultQuery);
+      return new MutableDataFrame({
+        refId: query.refId,
+        fields: [
+          { name: 'Time', values: [from, to], type: FieldType.time },
+          { name: 'Value', values: [query.constant, query.constant], type: FieldType.number },
+        ],
+      });
+    });
 
-  metricFindQuery(query: string, options?: any) {
-    console.log('metricFindQuery', query, options);
-    return Promise.resolve({ data: [] });
+    return Promise.resolve({ data });
   }
 
   testDatasource() {
+    // Implement a health check for your data source.
+
     return new Promise((resolve, reject) => {
       resolve({
         status: 'success',
-        message: 'yes!',
+        message: 'Success',
       });
     });
   }

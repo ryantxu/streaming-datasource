@@ -1,7 +1,9 @@
-///<reference path="../node_modules/grafana-sdk-mocks/app/headers/common.d.ts" />
+import { DataSourcePlugin } from '@grafana/ui';
+import { DataSource } from './DataSource';
+import { ConfigEditor } from './ConfigEditor';
+import { QueryEditor } from './QueryEditor';
+import { MyQuery, MyDataSourceOptions } from './types';
 
-import StreamingDatasource from './datasource';
-import { StreamingQueryCtrl } from './query_ctrl';
-import { StreamingConfigCtrl } from './config_ctrl';
-
-export { StreamingDatasource as Datasource, StreamingQueryCtrl as QueryCtrl, StreamingConfigCtrl as ConfigCtrl };
+export const plugin = new DataSourcePlugin<DataSource, MyQuery, MyDataSourceOptions>(DataSource)
+  .setConfigEditor(ConfigEditor)
+  .setQueryEditor(QueryEditor);
