@@ -4,12 +4,12 @@ import { MyDataSourceOptions } from './types';
 
 type Settings = DataSourceSettings<MyDataSourceOptions>;
 
-interface Props extends DataSourcePluginOptionsEditorProps<Settings> {}
+interface Props extends DataSourcePluginOptionsEditorProps<Settings> { }
 
-interface State {}
+interface State { }
 
 export class ConfigEditor extends PureComponent<Props, State> {
-  componentDidMount() {}
+  componentDidMount() { }
 
   onURLChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
@@ -17,17 +17,17 @@ export class ConfigEditor extends PureComponent<Props, State> {
     //   ...options.jsonData,
     //   apiKey: event.target.value,
     // };
-    onOptionsChange({ ...options, url: event.target.value });
+    onOptionsChange({ ...options, url: event.target.value, access: 'direct' });
   };
 
   render() {
     const { options } = this.props;
-    const { jsonData } = options;
 
+    const url = options.url || '';
     return (
       <div className="gf-form-group">
         <div className="gf-form">
-          <FormField label="Web Socket URL" labelWidth={10} onChange={this.onURLChange} value={jsonData.apiKey || ''} placeholder="Websocket URL" />
+          <FormField label="Web Socket URL" labelWidth={10} onChange={this.onURLChange} value={url} placeholder="Websocket URL" />
         </div>
       </div>
     );

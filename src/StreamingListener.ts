@@ -18,10 +18,21 @@ export class StreamListener {
 
   constructor(private capacity: number, url?: string) {
     if (url) {
-      this.stream = webSocket(url!);
+      this.stream = webSocket({
+        url,
+        openObserver: {
+          next: () => {
+            console.log('connetion ok');
+          },
+        },
+        closeObserver: {
+          next(closeEvent) {
+            console.log('connetion closed');
+          },
+        },
+      });
       this.stream!.subscribe({
         next: (msg: any) => {
-          console.log('GOT', msg);
           this.process(msg as TimeSeriesMessage);
         },
       });
@@ -103,5 +114,6 @@ export class StreamListener {
       state: LoadingState.Streaming, // ???
       data: [df],
     });
+    console.log('PROCESS', msg);
   }
 }
