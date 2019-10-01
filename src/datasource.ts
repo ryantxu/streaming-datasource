@@ -1,8 +1,10 @@
 import { DataQueryRequest, DataQueryResponse, DataSourceApi, DataSourceInstanceSettings } from '@grafana/ui';
 
 import { StreamingQuery, MyDataSourceOptions } from './types';
-import { Observable, of, merge } from 'rxjs';
+import { Observable, of, merge, interval } from 'rxjs';
+import { map } from 'rxjs/operators';
 import { StreamListener } from 'StreamingListener';
+import { LoadingState, DataFrame } from '@grafana/data';
 
 export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOptions> {
   listener?: StreamListener;
@@ -13,8 +15,26 @@ export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOption
   }
 
   query(options: DataQueryRequest<StreamingQuery>): Observable<DataQueryResponse> {
-    if (!this.listener) {
+    const { listener } = this;
+    if (!listener) {
       throw new Error('missing listener');
+    }
+
+    const isLive = options.rangeRaw && options.rangeRaw!.to === 'now';
+    if (!isLive) {
+      let hasStar = false;
+      let data: DataFrame[] = [];
+      options.targets.forEach(t => {
+        if (!t.name || t.name === '*') {
+          hasStar = true;
+        } else {
+          data.push(listener.getOrCreate(t.name).frame);
+        }
+      });
+      if (hasStar) {
+        data = listener.getAllFrames();
+      }
+      return of({ data });
     }
 
     let hasStar = false;
@@ -23,13 +43,26 @@ export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOption
       if (!t.name || t.name === '*') {
         hasStar = true;
       } else {
-        subs.push(this.listener!.listen(t.name));
+        subs.push(listener.listen(t.name));
       }
     });
 
     if (hasStar) {
-      subs = this.listener.getAllObservers();
+      subs = listener.getAllObservers();
     }
+
+    // Update every 1/2 sec regardless of results
+    const ping = interval(1000).pipe(
+      map(v => {
+        return {
+          key: 'heartbeat',
+          state: LoadingState.Streaming,
+          data: [],
+        } as DataQueryResponse;
+      })
+    );
+    subs.push(ping);
+
     if (subs.length === 0) {
       return of({ data: [] }); // nothing
     }
@@ -41,6 +74,7 @@ export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOption
 
   testDatasource() {
     // Implement a health check for your data source.
+
     return new Promise((resolve, reject) => {
       resolve({
         status: 'success',

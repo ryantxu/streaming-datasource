@@ -1,5 +1,5 @@
 import { TimeSeriesMessage } from 'types';
-import { KeyValue, CircularDataFrame, FieldType, LoadingState } from '@grafana/data';
+import { KeyValue, CircularDataFrame, FieldType, LoadingState, DataFrame } from '@grafana/data';
 import { Subject, Observable, ReplaySubject } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 import { DataQueryResponse } from '@grafana/ui';
@@ -17,7 +17,8 @@ export class StreamListener {
   stream?: WebSocketSubject<any>;
 
   constructor(private capacity: number, url?: string) {
-    if (url) {
+    if (url && url.length > 4 && url.startsWith('ws')) {
+      console.log('Connect to:', url);
       this.stream = webSocket({
         url,
         openObserver: {
@@ -65,6 +66,14 @@ export class StreamListener {
     setTimeout(this.dummyValues, 100 + Math.random() * 800); // ~1/sec
   };
 
+  getAllFrames(): DataFrame[] {
+    const all: DataFrame[] = [];
+    for (const v of Object.values(this.byName)) {
+      all.push(v.frame);
+    }
+    return all;
+  }
+
   getAllObservers(): Array<Observable<DataQueryResponse>> {
     const all: Array<Observable<DataQueryResponse>> = [];
     for (const v of Object.values(this.byName)) {
@@ -111,9 +120,8 @@ export class StreamListener {
     df.validate();
     info.subject.next({
       key: info.key,
-      state: LoadingState.Streaming, // ???
+      state: LoadingState.Streaming,
       data: [df],
     });
-    console.log('PROCESS', msg);
   }
 }
