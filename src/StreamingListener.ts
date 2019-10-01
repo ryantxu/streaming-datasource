@@ -14,16 +14,45 @@ interface FrameInfo {
 
 export class StreamListener {
   byName: KeyValue<FrameInfo> = {};
-  stream: WebSocketSubject<any>;
+  stream?: WebSocketSubject<any>;
 
-  constructor(private capacity: number, url: string) {
-    this.stream = webSocket(url);
-    this.stream.subscribe({
-      next: (msg: any) => {
-        console.log('GOT', msg);
-      },
-    });
+  constructor(private capacity: number, url?: string) {
+    if (url) {
+      this.stream = webSocket(url!);
+      this.stream!.subscribe({
+        next: (msg: any) => {
+          console.log('GOT', msg);
+          this.process(msg as TimeSeriesMessage);
+        },
+      });
+    } else {
+      this.dummy['aaa'] = 50 + Math.random() * 25;
+      this.dummy['bbb'] = 50 + Math.random() * 25;
+      this.dummy['ccc'] = 50 + Math.random() * 25;
+      setTimeout(this.dummyValues, 100);
+    }
   }
+
+  dummy: KeyValue<number> = {};
+  dummyValues = () => {
+    const time = Date.now();
+    if (Math.random() > 0.3) {
+      const name = 'aaa';
+      const value = (this.dummy[name] = this.dummy[name] + (Math.random() - 0.5));
+      this.process({ name, time, value });
+    }
+    if (Math.random() > 0.5) {
+      const name = 'bbb';
+      const value = (this.dummy[name] = this.dummy[name] + (Math.random() - 0.5));
+      this.process({ name, time, value });
+    }
+    if (Math.random() > 0.7) {
+      const name = 'ccc';
+      const value = (this.dummy[name] = this.dummy[name] + (Math.random() - 0.5));
+      this.process({ name, time, value });
+    }
+    setTimeout(this.dummyValues, 100 + Math.random() * 800); // ~1/sec
+  };
 
   getAllObservers(): Array<Observable<DataQueryResponse>> {
     const all: Array<Observable<DataQueryResponse>> = [];

@@ -9,9 +9,7 @@ export class DataSource extends DataSourceApi<StreamingQuery, MyDataSourceOption
 
   constructor(instanceSettings: DataSourceInstanceSettings<MyDataSourceOptions>) {
     super(instanceSettings);
-    if (instanceSettings.url) {
-      this.listener = new StreamListener(1000, instanceSettings.url);
-    }
+    this.listener = new StreamListener(1000, instanceSettings.url);
   }
 
   query(options: DataQueryRequest<StreamingQuery>): Observable<DataQueryResponse> {
