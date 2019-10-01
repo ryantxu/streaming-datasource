@@ -4,12 +4,12 @@ import { MyDataSourceOptions } from './types';
 
 type Settings = DataSourceSettings<MyDataSourceOptions>;
 
-interface Props extends DataSourcePluginOptionsEditorProps<Settings> { }
+interface Props extends DataSourcePluginOptionsEditorProps<Settings> {}
 
-interface State { }
+interface State {}
 
 export class ConfigEditor extends PureComponent<Props, State> {
-  componentDidMount() { }
+  componentDidMount() {}
 
   onURLChange = (event: ChangeEvent<HTMLInputElement>) => {
     const { onOptionsChange, options } = this.props;
