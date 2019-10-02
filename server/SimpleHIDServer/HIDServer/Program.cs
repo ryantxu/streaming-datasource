@@ -56,7 +56,9 @@ namespace HIDServer
             c.URL = "http://localhost:8086/";
 
             HttpInfluxDB db = new HttpInfluxDB(c);
+            db.CreateDatabase("influxdays");
             sockets.influx = new HttpInfluxWriter(db, "influxdays", 50000);
+
 
             // Every 10s flush the data
             var timer = new Timer(10000);
