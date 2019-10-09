@@ -12,9 +12,13 @@ export interface MyDataSourceOptions extends DataSourceJsonData {
   apiKey?: string;
 }
 
-export interface TimeSeriesMessage {
+export interface TimeSeriesValue {
   name: string; // Name of the field
   config?: FieldConfig; // optionally include field config
   time?: number;
   value?: any;
+}
+
+export interface TimeSeriesMessage {
+  events: TimeSeriesValue[];
 }

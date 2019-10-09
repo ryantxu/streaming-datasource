@@ -1,4 +1,4 @@
-import { TimeSeriesMessage } from 'types';
+import { TimeSeriesMessage, TimeSeriesValue } from './types';
 import { KeyValue, CircularDataFrame, FieldType, LoadingState, DataFrame } from '@grafana/data';
 import { Subject, Observable, ReplaySubject } from 'rxjs';
 import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
@@ -33,8 +33,10 @@ export class StreamListener {
         },
       });
       this.stream!.subscribe({
-        next: (msg: any) => {
-          this.process(msg as TimeSeriesMessage);
+        next: (msg: TimeSeriesMessage) => {
+          for (const evt of msg.events) {
+            this.process(evt);
+          }
         },
       });
     } else {
@@ -100,7 +102,7 @@ export class StreamListener {
     return this.getOrCreate(name).subject;
   }
 
-  process(msg: TimeSeriesMessage) {
+  process(msg: TimeSeriesValue) {
     const info = this.getOrCreate(msg.name);
     const df = info.frame;
     if (!df.fields.length) {

@@ -1,4 +1,5 @@
-.vscode
+.vscode/
+.vs/
 bin/
 obj/
 packages/
