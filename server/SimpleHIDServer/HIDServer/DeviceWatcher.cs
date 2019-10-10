@@ -75,13 +75,18 @@ namespace HIDServer
             {
                 int changedIndex = parser.GetNextChangedIndex();
                 var dataValue = parser.GetValue(changedIndex);
-                double val = dataValue.GetPhysicalValue();
                 uint key = dataValue.Usages.FirstOrDefault();
                 if (!values.ContainsKey(key))
                 {
+                    string disp = ((Usage)key).ToString();
+                    if(disp.StartsWith("427"))
+                    {
+                        Console.WriteLine("SKIP: "+disp);
+                        continue;
+                    }
                     DeviceValue tmp = new DeviceValue();
                     tmp.item = dataValue.DataItem;
-                    tmp.name = this.name + ((Usage)key).ToString();
+                    tmp.name = this.name + disp;
                     values[key] = tmp;
                 }
                 DeviceValue v = values[key];
@@ -99,8 +104,7 @@ namespace HIDServer
                 {
                     sockets.write(v);
                 }
-
-                Console.WriteLine(v.ToJSON());
+                //Console.WriteLine(v.ToJSON());
             }
         }
 
