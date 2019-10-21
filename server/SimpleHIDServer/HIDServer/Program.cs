@@ -67,7 +67,7 @@ namespace HIDServer
                         str.Append(",");
                     }
                     str.Append(this.events[i]);
-                    Console.WriteLine(" " + this.events[i]);
+                   // Console.WriteLine(" " + this.events[i]);
                 }
                 str.Append("]}");
                 this.events.Clear();
